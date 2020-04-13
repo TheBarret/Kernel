@@ -1,4 +1,4 @@
-#!/binbash
+#!/bin/bash
 
 # Bootloader
 as --32 bootloader.s -o bootloader.o
