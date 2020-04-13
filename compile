@@ -1,0 +1,26 @@
+#!/binbash
+
+# Bootloader
+as --32 bootloader.s -o bootloader.o
+as --32 port.s -o port.o
+
+
+# Kernel and lib files
+gcc -m32 -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+gcc -m32 -c screen.c -o screen.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+gcc -m32 -c mem.c -o mem.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+gcc -m32 -c string.c -o string.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+# Linker
+ld -m elf_i386 -T linker.ld screen.o kernel.o bootloader.o port.o mem.o string.o -o boxy.bin -nostdlib
+
+# Directories and configs
+mkdir -p iso/boot/grub
+cp boxy.bin iso/boot/boxy.bin
+cp grub.cfg iso/boot/grub/grub.cfg
+
+# Create iso
+grub-file --is-x86-multiboot iso/boot/boxy.bin
+grub-mkrescue -o boxy.iso iso
+
+rm ./*.o
